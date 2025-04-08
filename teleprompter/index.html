@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teleprompter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="control-panel">
+            <h1>Teleprompter</h1>
+            <div class="input-section">
+                <label for="input-text">Your speech</label>
+                <small>markdown format supported <a href="#" id="markdown-help">(what's that?)</a></small>
+                <textarea id="input-text" placeholder="Paste your markdown text here..."></textarea>
+            </div>
+            <div class="controls">
+                <label for="speed">Scroll Speed:</label>
+                <select id="speed">
+                    <option value="1">Slow</option>
+                    <option value="2" selected>Medium</option>
+                    <option value="3">Fast</option>
+                    <option value="4">Very Fast</option>
+                </select>
+                <button id="start-btn">Start</button>
+                <button id="stop-btn">Stop</button>
+                <button id="reset-btn">Reset</button>
+            </div>
+        </div>
+        <div class="teleprompter-window">
+            <div class="red-line"></div>
+            <div id="prompter-text"></div>
+        </div>
+    </div>
+
+    <!-- Markdown Help Overlay -->
+    <div id="markdown-overlay" class="overlay">
+        <div class="overlay-content">
+            <span class="close-btn">&times;</span>
+            <pre class="markdown-guide">Formatting with markdown:
+
+# Heading 1
+## Heading 2
+### Heading 3
+
+This is a paragraph with **bold text**, *italic text*, and `inline code`.
+
+---
+
+#### Lists
+
+- Item 1
+- Item 2
+  - Nested Item 2a
+  - Nested Item 2b
+- Item 3
+
+1. First
+2. Second
+3. Third
+
+---
+
+#### Image
+
+![Test Image](https://via.placeholder.com/150)
+
+---
+
+#### Code Block (JavaScript)
+
+```javascript
+function greet(name) {
+  console.log(`Hello, ${name}!`);
+}
+greet('world');
+```
+
+---
+
+> This is a blockquote.  
+> It can span multiple lines.
+
+---
+
+**Table Example:**
+
+| Name     | Role      | Active |
+|----------|-----------|--------|
+| Alice    | Admin     | ✅     |
+| Bob      | User      | ❌     |
+| Charlie  | Moderator | ✅     |
+
+---
+
+That's it! 🎉</pre>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
