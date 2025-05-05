@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const markdownHelp = document.getElementById('markdown-help');
     const markdownOverlay = document.getElementById('markdown-overlay');
     const closeBtn = document.querySelector('.close-btn');
+    const resumeBtn = document.getElementById('resume-btn');
 
     let scrollInterval;
     let currentPosition = 75;
@@ -16,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let isManualScrolling = false;
     let lastTouchY = 0;
     let currentSpeed = 2; // Default speed
+    let isPaused = false;
+    let pauseCooldown = false;
 
     // Save text to localStorage
     function saveToStorage() {
@@ -34,15 +37,40 @@ document.addEventListener('DOMContentLoaded', () => {
     // Convert markdown to HTML and update the prompter text
     function updatePrompterText() {
         const markdownText = inputText.value;
-        const htmlText = marked.parse(markdownText);
-        prompterText.innerHTML = htmlText;
+        const lines = markdownText.split('\n');
+        let htmlLines = [];
+        lines.forEach((line) => {
+            if (/^\s*pause\s*$/i.test(line)) {
+                htmlLines.push('<div class="prompter-line pause-line">PAUSE</div>');
+            } else {
+                htmlLines.push(`<div class="prompter-line">${marked.parseInline(line)}</div>`);
+            }
+        });
+        prompterText.innerHTML = htmlLines.join('');
         resetPrompter();
-        saveToStorage(); // Save after each update
+        saveToStorage();
+    }
+
+    // Helper: get the .pause-line currently at the vertical center of the teleprompter window
+    function isPauseLineAtRedLine() {
+        const pauseLines = prompterText.querySelectorAll('.pause-line');
+        if (!pauseLines.length) return false;
+        const windowRect = teleprompterWindow.getBoundingClientRect();
+        const redLineY = windowRect.top + windowRect.height / 2;
+        for (const pauseLine of pauseLines) {
+            const rect = pauseLine.getBoundingClientRect();
+            if (rect.top <= redLineY && rect.bottom >= redLineY) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // Start scrolling
     function startScrolling() {
-        if (isScrolling) return;
+        if (isScrolling || isPaused) return;
+        pauseCooldown = true;
+        setTimeout(() => { pauseCooldown = false; }, 5000);
         isScrolling = true;
         currentSpeed = parseInt(speedSelect.value);
         
@@ -51,6 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
             currentPosition -= scrollStep;
             prompterText.style.transform = `translateY(${currentPosition}vh)`;
             
+            // Check for PAUSE line at the red line
+            if (!pauseCooldown && isPauseLineAtRedLine()) {
+                stopScrolling();
+                isPaused = true;
+                resumeBtn.style.display = 'block';
+                return;
+            }
+
             // Stop when text has scrolled completely off screen
             if (currentPosition < -100) {
                 stopScrolling();
@@ -125,6 +161,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add speed change listener
     speedSelect.addEventListener('change', () => {
         currentSpeed = parseInt(speedSelect.value);
+    });
+
+    resumeBtn.addEventListener('click', () => {
+        if (isPaused) {
+            isPaused = false;
+            resumeBtn.style.display = 'none';
+            pauseCooldown = true;
+            setTimeout(() => { pauseCooldown = false; }, 5000);
+            startScrolling();
+        }
     });
 
     // Initialize
