@@ -2,6 +2,9 @@
 
 A simple, one-page HTML/CSS/JavaScript **teleprompter app** designed for presenters who want to follow a script while looking at their screen – perfect for **online presentations**, **webinars**, or **recorded videos**.
 
+
+#See the demo here: https://markc0909.github.io/teleprompter/teleprompter/
+
 ## 🎯 Features
 
 - 📜 Supports **Markdown formatting** (with built-in formatting guide)
